@@ -6,6 +6,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import "./style.scss"
 
 const DataContext = createContext({});
 
@@ -30,6 +31,11 @@ export const DataProvider = ({ children }) => {
     if (data) return;
     getData();
   });
+  const last = data?.events.pop()
+
+  if(!data){
+    return <div className="loader">Chargement</div>
+  }
   
   return (
     <DataContext.Provider
@@ -37,6 +43,7 @@ export const DataProvider = ({ children }) => {
       value={{
         data,
         error,
+        last,
       }}
     >
       {children}
