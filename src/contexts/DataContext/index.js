@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import {
   createContext,
-  useCallback,
   useContext,
   useEffect,
   useState,
@@ -20,18 +19,17 @@ export const api = {
 export const DataProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
-  const getData = useCallback(async () => {
-    try {
-      setData(await api.loadData());
-    } catch (err) {
-      setError(err);
-    }
-  }, []);
-  useEffect(() => {
-    if (data) return;
-    getData();
-  });
-  const last = data?.events.pop()
+  const [last, setLast] = useState({});
+  useEffect(() =>{
+    api.loadData()
+    .then(response => {
+      setData(response);
+      setLast(response.events.sort((evtA, evtB) =>
+      new Date(evtA.date) > new Date(evtB.date) ? -1 : 1
+      )[0])
+    })
+    .catch(err => setError(err))
+  }, [data])
 
   if(!data){
     return <div className="loader">Chargement</div>
