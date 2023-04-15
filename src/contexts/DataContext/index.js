@@ -29,7 +29,7 @@ export const DataProvider = ({ children }) => {
       )[0])
     })
     .catch(err => setError(err))
-  }, [data])
+  }, [])
 
   if(!data){
     return <div className="loader">Chargement</div>
