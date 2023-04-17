@@ -16,26 +16,33 @@ export const api = {
   },
 };
 
+
+
 export const DataProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
   const [last, setLast] = useState({});
-  useEffect(() =>{
+  const [load, setLoad] = useState(true);
+  const getData = async () => {
     api.loadData()
-    .then(response => {
-      setData(response);
-      setLast(response.events.sort((evtA, evtB) =>
-      new Date(evtA.date) > new Date(evtB.date) ? -1 : 1
-      )[0])
-    })
-    .catch(err => setError(err))
-  }, [])
-
-  if(!data){
-    return <div className="loader">Chargement</div>
+      .then(response => {
+        setData(response);
+        setLast(response.events.sort((evtA, evtB) =>
+        new Date(evtA.date) > new Date(evtB.date) ? -1 : 1
+        )[0])
+      })
+      .catch(err => setError(err))
   }
+
+  useEffect(() => {
+    if (load) {
+      getData();
+    }
+    return setLoad(false);
+  }, [data])
+
   
-  return (
+  return data ? (
     <DataContext.Provider
       // eslint-disable-next-line react/jsx-no-constructed-context-values
       value={{
@@ -46,7 +53,7 @@ export const DataProvider = ({ children }) => {
     >
       {children}
     </DataContext.Provider>
-  );
+  ) : (<div className="loader">Chargement</div>);
 };
 
 DataProvider.propTypes = {
