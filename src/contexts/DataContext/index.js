@@ -21,20 +21,21 @@ export const api = {
 export const DataProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
-  const [last, setLast] = useState({});
+  const [last, setLast] = useState(null);
   const [load, setLoad] = useState(true);
   const getData = async () => {
-    api.loadData()
-      .then(response => {
+    try {
+        const response = await api.loadData();
         setData(response);
-        setLast(response.events.sort((evtA, evtB) =>
-        new Date(evtA.date) > new Date(evtB.date) ? -1 : 1
-        )[0])
-      })
-      .catch(err => setError(err))
+        setLast(response.events.sort((evtA, evtB) => new Date(evtA.date) > new Date(evtB.date) ? -1 : 1)[0])
+    }
+    catch(err) {
+      setError(err)
+    }
   }
 
   useEffect(() => {
+    setLoad(true)
     if (load) {
       getData();
     }
@@ -53,7 +54,7 @@ export const DataProvider = ({ children }) => {
     >
       {children}
     </DataContext.Provider>
-  ) : (<div className="loader">Chargement</div>);
+  ) : (error);
 };
 
 DataProvider.propTypes = {
