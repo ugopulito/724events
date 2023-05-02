@@ -2,7 +2,6 @@ import PropTypes from "prop-types";
 import {
   createContext,
   useContext,
-  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -24,17 +23,16 @@ export const DataProvider = ({ children }) => {
   const [data, setData] = useState(null);
   const [last, setLast] = useState(null);
   const [load, setLoad] = useState(true);
-  const getData = useCallback (async () => {
+  const getData = async () => {
     try {
         const response = await api.loadData();
-        const sortedEvents = [...response.events].sort((evtA, evtB) => new Date(evtA.date) > new Date(evtB.date) ? -1 : 1);
         setData(response);
-        setLast(sortedEvents[0]);
+        setLast(response.events.sort((evtA, evtB) => new Date(evtA.date) > new Date(evtB.date) ? -1 : 1)[0])
     }
     catch(err) {
       setError(err)
     }
-  }, []);
+  }
 
   useEffect(() => {
     setLoad(true)
